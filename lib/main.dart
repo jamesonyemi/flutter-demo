@@ -15,7 +15,7 @@ void main(){
 
   final ThemeData kDefaultTheme = new ThemeData(
     primarySwatch: Colors.pink,
-    accentColor: Colors.pinkAccent[400],
+    accentColor: Colors.pinkAccent[600],
   );
 // End of color Scheme for IOS and ANDROID
 
@@ -62,7 +62,12 @@ class ChatMessage extends StatelessWidget {
                 new Text(_name,style: Theme.of(context).textTheme.subhead),
                 new Container(
                   margin: const EdgeInsets.only(top: 5.0),
-                  child: new Text(text),
+                  child: new Text(text,
+                  style: new TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold
+                    ),
+                  ),
                 )
               ],
             ),
@@ -86,7 +91,7 @@ class ChatMessage extends StatelessWidget {
    bool _isComposing = false;
    @override
     Widget _buildTextComposer() {
-    return new IconTheme(
+     return new IconTheme(
        data: new IconThemeData(color: Theme.of(context).accentColor),
         child: new Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -94,11 +99,17 @@ class ChatMessage extends StatelessWidget {
           children: <Widget>[
             new Flexible(
               child: new TextField(
+                style: new TextStyle(
+                  color: Colors.white, 
+                  decorationStyle: TextDecorationStyle.wavy,
+                  fontSize: 18.0
+                  ),
                 controller: _textController,
                 onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
                 onSubmitted: _handleSubmitted,
                 decoration: new InputDecoration.collapsed(
-                  hintText: "Send a Message"
+                  hintText: "Send a Message",
+                  hintStyle: new TextStyle(color: Colors.white70)
                 ),
               ),
             ),
@@ -115,6 +126,7 @@ class ChatMessage extends StatelessWidget {
                 ) :
             new IconButton(
                 icon: new Icon(Icons.send),
+                color: Colors.white,
                 onPressed:_isComposing ? () => _handleSubmitted(_textController.text) : null,
                 // onPressed: () {return _handleSubmitted(_textController.text);} //Alternative Syntax
               ),
@@ -124,7 +136,7 @@ class ChatMessage extends StatelessWidget {
         ),
       ),
     );
-  }
+   }
   
   @override
   void dispose(){
@@ -171,7 +183,10 @@ class ChatMessage extends StatelessWidget {
             ),
             new Divider(height: 1.0),
             new Container(
-              decoration: new BoxDecoration(color: Theme.of(context).cardColor),
+              decoration: new BoxDecoration(
+                color: Theme.of(context).accentColor,
+                borderRadius: new BorderRadius.all(const Radius.circular(20.0))
+              ),
               child: _buildTextComposer(),
             )
           ],
