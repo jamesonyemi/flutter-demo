@@ -64,8 +64,9 @@ class ChatMessage extends StatelessWidget {
                   margin: const EdgeInsets.only(top: 5.0),
                   child: new Text(text,
                   style: new TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold
+                    fontSize: 15.50,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Roboto',
                     ),
                   ),
                 )
@@ -95,44 +96,50 @@ class ChatMessage extends StatelessWidget {
        data: new IconThemeData(color: Theme.of(context).accentColor),
         child: new Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: new Row(
-          children: <Widget>[
-            new Flexible(
-              child: new TextField(
-                style: new TextStyle(
-                  color: Colors.white, 
-                  decorationStyle: TextDecorationStyle.wavy,
-                  fontSize: 18.0
+        // width: 250.0,
+        child: new Padding(
+         padding: new EdgeInsets.only(left:20.0),
+          child: new Row(
+            children: <Widget>[
+              new Flexible(
+                child: new Container(
+                  child: new TextField(
+                    style: new TextStyle(
+                      color: Colors.white, 
+                      decorationStyle: TextDecorationStyle.wavy,
+                      fontSize: 18.0
+                      ),
+                    controller: _textController,
+                    onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
+                    onSubmitted: _handleSubmitted,
+                    decoration: new InputDecoration.collapsed(
+                      hintText: "Type a mess...",
+                      hintStyle: new TextStyle(color: Colors.white70)
+                    ),
                   ),
-                controller: _textController,
-                onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
-                onSubmitted: _handleSubmitted,
-                decoration: new InputDecoration.collapsed(
-                  hintText: "Send a Message",
-                  hintStyle: new TextStyle(color: Colors.white70)
                 ),
               ),
-            ),
-         
-        // Material-Icon send button
-            new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 4.0),
-               child: Theme.of(context).platform == TargetPlatform.iOS ?
-               new CupertinoButton(
-                 child: new Text("Send"),
-                 onPressed: _isComposing
-                 ? () => _handleSubmitted(_textController.text)
-                 : null,
-                ) :
-            new IconButton(
-                icon: new Icon(Icons.send),
-                color: Colors.white,
-                onPressed:_isComposing ? () => _handleSubmitted(_textController.text) : null,
-                // onPressed: () {return _handleSubmitted(_textController.text);} //Alternative Syntax
+           
+          // Material-Icon send button
+              new Container(
+                margin: new EdgeInsets.symmetric(horizontal: 4.0),
+                 child: Theme.of(context).platform == TargetPlatform.iOS ?
+                 new CupertinoButton(
+                   child: new Text("Send"),
+                   onPressed: _isComposing
+                   ? () => _handleSubmitted(_textController.text)
+                   : null,
+                  ) :
+              new IconButton(
+                  icon: new Icon(Icons.send),
+                  color: Colors.white,
+                  onPressed:_isComposing ? () => _handleSubmitted(_textController.text) : null,
+                  // onPressed: () {return _handleSubmitted(_textController.text);} //Alternative Syntax
+                ),
+                
               ),
-              
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
