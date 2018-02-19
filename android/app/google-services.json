@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "351441027866",
+    "firebase_url": "https://bekindapp-5e94c.firebaseio.com",
+    "project_id": "bekindapp-5e94c",
+    "storage_bucket": "bekindapp-5e94c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:351441027866:android:4218a34a979ca2a4",
+        "android_client_info": {
+          "package_name": "com.yourcompany.demoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "351441027866-1to3hjtjbi0eqvqrjukpk5dql23l9dqk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yourcompany.demoapp",
+            "certificate_hash": "a76a0a8e414e0dc0c839a5c4f95417c2bd507328"
+          }
+        },
+        {
+          "client_id": "351441027866-8cbavnremtl808k6f55kpinm1p00cjqd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeId5Y2swMPS6OC9q6EiQap4x_C1FM5TM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "351441027866-8cbavnremtl808k6f55kpinm1p00cjqd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
