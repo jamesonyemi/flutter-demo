@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:async';
 
 void main(){
   runApp(new BeKindApp());
 }
+
+const String _name = "James";  //  declaring, name as a variable
+final googleSignIn = new GoogleSignIn();
 
 //default color scheme for both IOS and ANDRIOD respectively
  final ThemeData kIOSTheme = new ThemeData(
@@ -19,9 +23,6 @@ void main(){
     accentColor: Colors.pinkAccent[600],
   );
 // End of color Scheme for IOS and ANDROID
-
-//  declaring, name as a variable
-const String _name = "James";
 
 class BeKindApp extends StatelessWidget {
   @override
@@ -88,6 +89,15 @@ class ChatMessage extends StatelessWidget {
 
  class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
+   Future<Null> _ensureLoggedIn() async {
+   GoogleSignInAccount user = googleSignIn.currentUser;
+    if (user == null)
+      user = await googleSignIn.signInSilently();
+    if (user == null) {
+      await googleSignIn.signIn();
+    }
+  }
+  
    final TextEditingController _textController = new TextEditingController();
    final List<ChatMessage> _messages = <ChatMessage>[];
    bool _isComposing = false;
