@@ -160,7 +160,7 @@ class ChatMessage extends StatelessWidget {
     _textController.clear();
       setState(() => _isComposing =false);
       await _ensureLoggedIn();
-      _sendMessage(text: text)
+      _sendMessage(text: text);
 
     ChatMessage message = new ChatMessage(
       text: text,
