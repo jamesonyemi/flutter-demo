@@ -1,15 +1,26 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'dart:async';
 
 void main(){
   runApp(new BeKindApp());
 }
 
-const String _name = "James";  //  declaring, name as a variable
+final String _currentUserName = googleSignIn.currentUser.displayName;  //  declaring, name as a variable
+final String _currentUserPhoto = googleSignIn.currentUser.photoUrl;
+final TextEditingController _textController = new TextEditingController();
+final List<ChatMessage> _messages = <ChatMessage>[];
+bool _isComposing = false;
 final googleSignIn = new GoogleSignIn();
+final analytics = new FirebaseAnalytics();
+final auth = FirebaseAuth.instance;
 
 //default color scheme for both IOS and ANDRIOD respectively
  final ThemeData kIOSTheme = new ThemeData(
@@ -53,7 +64,10 @@ class ChatMessage extends StatelessWidget {
         children: <Widget>[
           new Container(
             margin: const EdgeInsets.only(right: 16.0),
-            child: new CircleAvatar(child: new Text(_name[0])),
+            child: new CircleAvatar(
+              backgroundImage: new NetworkImage(_currentUserPhoto),
+              // child: new Text(_currentUserName[0])
+              ),
           ),
           new Expanded(
             child: new Column(
@@ -61,7 +75,10 @@ class ChatMessage extends StatelessWidget {
               textDirection: TextDirection.ltr,
               verticalDirection: VerticalDirection.down,
               children: <Widget>[
-                new Text(_name,style: Theme.of(context).textTheme.subhead),
+                new Text(
+                  _currentUserName,
+                  style: Theme.of(context).textTheme.subhead
+                  ),
                 new Container(
                   margin: const EdgeInsets.only(top: 5.0),
                   child: new Text(text,
@@ -88,20 +105,7 @@ class ChatMessage extends StatelessWidget {
  }
 
  class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-
-   Future<Null> _ensureLoggedIn() async {
-   GoogleSignInAccount user = googleSignIn.currentUser;
-    if (user == null)
-      user = await googleSignIn.signInSilently();
-    if (user == null) {
-      await googleSignIn.signIn();
-    }
-  }
-  
-   final TextEditingController _textController = new TextEditingController();
-   final List<ChatMessage> _messages = <ChatMessage>[];
-   bool _isComposing = false;
-   @override
+  //  @override
     Widget _buildTextComposer() {
      return new IconTheme(
        data: new IconThemeData(color: Theme.of(context).accentColor),
@@ -162,22 +166,53 @@ class ChatMessage extends StatelessWidget {
       message.animationController.dispose();
     }
   }
+final firebasedbReference = FirebaseDatabase.instance.reference().child('messages');
 
   // clear the field on the text input field
-  void _handleSubmitted(String text) {
+ Future<Null> _handleSubmitted(String text) async {
     _textController.clear();
       setState(() => _isComposing =false);
-    ChatMessage message = new ChatMessage(
+      await _ensureLoggedIn();
+      _sendMessage(text: text);
+ }
+    void _sendMessage({String text}) {
+      ChatMessage message = new ChatMessage(
       text: text,
       animationController: new AnimationController(
         duration: new Duration(milliseconds: 750),
         vsync: this,
       ),
     );
+
+    firebasedbReference.push().set({                                 
+    'text': text,                                        
+    'senderName': googleSignIn.currentUser.displayName,  
+    'senderPhotoUrl': googleSignIn.currentUser.photoUrl, 
+  });              
     setState(() => _messages.insert(0, message)); 
     message.animationController.forward();
+    analytics.logEvent(name: 'send_message');
+    //analytics.logEvent(name: 'first_open');
   }
 
+  Future<Null> _ensureLoggedIn() async {
+  GoogleSignInAccount user = googleSignIn.currentUser;
+  if (user == null)
+    user = await googleSignIn.signInSilently();
+  if (user == null) {
+    await googleSignIn.signIn();
+    analytics.logLogin();
+  }
+  if (await auth.currentUser() == null) {
+    GoogleSignInAuthentication credentials =
+    await googleSignIn.currentUser.authentication;
+    await auth.signInWithGoogle(
+      idToken: credentials.idToken,
+      accessToken: credentials.accessToken
+    );
+  }
+}
+  
    Widget build(BuildContext context) {
      return new Scaffold(
          appBar:  new AppBar(
@@ -192,11 +227,18 @@ class ChatMessage extends StatelessWidget {
         child: new Column(
           children: <Widget>[
             new Flexible(
-              child: new ListView.builder(
+              child: new FirebaseAnimatedList(
+                query: firebasedbReference,
+                sort: (a,b) => b.key.compareTo(a.key),
                 padding: new EdgeInsets.all(8.0),
                 reverse: true,
-                itemBuilder: (_, int index) => _messages[index],
-                itemCount: _messages.length,
+                itemBuilder: (_, DataSnapshot snapshot, Animation<double> animation) { 
+                return new ChatMessage(
+                  snapshot: snapshot,
+                  animation:animation
+                 );
+                },
+                //itemCount: _messages.length,
               ),
             ),
             new Divider(height: 1.0),
