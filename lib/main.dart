@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:async';
 
 void main(){
   runApp(new BeKindApp());
@@ -21,6 +23,7 @@ void main(){
 
 //  declaring, name as a variable
 const String _name = "James";
+final googleSignIn = new GoogleSignIn();
 
 class BeKindApp extends StatelessWidget {
   @override
@@ -153,9 +156,12 @@ class ChatMessage extends StatelessWidget {
   }
 
   // clear the field on the text input field
-  void _handleSubmitted(String text) {
+  Future<Null> _handleSubmitted(String text) async {
     _textController.clear();
       setState(() => _isComposing =false);
+      await _ensureLoggedIn();
+      _sendMessage(text: text)
+
     ChatMessage message = new ChatMessage(
       text: text,
       animationController: new AnimationController(
@@ -208,4 +214,12 @@ class ChatMessage extends StatelessWidget {
       ),
      );
    }
+Future<Null> _ensureLoggedIn() async {
+  GoogleSignInAccount user = googleSignIn.currentUser;
+  if (user == null)
+    user = await googleSignIn.signInSilently();
+  if (user == null) {
+    await googleSignIn.signIn();
+  }
+}
  }
