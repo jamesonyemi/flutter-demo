@@ -7,17 +7,16 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:async';
+import 'dart:math';
+import 'dart:io';
 
 void main(){
   runApp(new BeKindApp());
 }
-
-final String _currentUserName = googleSignIn.currentUser.displayName;  //  declaring, name as a variable
-final String _currentUserPhoto = googleSignIn.currentUser.photoUrl;
-final TextEditingController _textController = new TextEditingController();
-final List<ChatMessage> _messages = <ChatMessage>[];
 bool _isComposing = false;
+final TextEditingController _textController = new TextEditingController();
 final googleSignIn = new GoogleSignIn();
 final analytics = new FirebaseAnalytics();
 final auth = FirebaseAuth.instance;
@@ -48,14 +47,14 @@ class BeKindApp extends StatelessWidget {
 
 // implementation of chat message list
 class ChatMessage extends StatelessWidget {
-  ChatMessage({this.text, this.animationController});
-  final String text;
-  final AnimationController animationController;
+  ChatMessage({this.snapshot, this.animation});
+  final DataSnapshot snapshot;
+  final Animation animation;
   @override
   Widget build(BuildContext context) {
     return new SizeTransition(
       sizeFactor: new CurvedAnimation(
-        parent: animationController, curve: Curves.easeIn),
+        parent: animation, curve: Curves.easeIn),
       axisAlignment: 0.0,
     child: new Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0),
@@ -65,7 +64,7 @@ class ChatMessage extends StatelessWidget {
           new Container(
             margin: const EdgeInsets.only(right: 16.0),
             child: new CircleAvatar(
-              backgroundImage: new NetworkImage(_currentUserPhoto),
+              backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
               // child: new Text(_currentUserName[0])
               ),
           ),
@@ -76,18 +75,31 @@ class ChatMessage extends StatelessWidget {
               verticalDirection: VerticalDirection.down,
               children: <Widget>[
                 new Text(
-                  _currentUserName,
+                  snapshot.value['senderName'],
                   style: Theme.of(context).textTheme.subhead
                   ),
                 new Container(
                   margin: const EdgeInsets.only(top: 5.0),
-                  child: new Text(text,
+                  child: snapshot.value['imageUrl'] != null ?
+                  new Image.network(
+                    snapshot.value['imageUrl'],
+                    width: 250.0,
+                  ):
+                  new Text(snapshot.value['text'],
                   style: new TextStyle(
                     fontSize: 15.50,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'Roboto',
                     ),
                   ),
+                  // child: new Text(
+                  // snapshot.value['text'],
+                  // style: new TextStyle(
+                  //   fontSize: 15.50,
+                  //   fontWeight: FontWeight.w500,
+                  //   fontFamily: 'Roboto',
+                  //   ),
+                  // ),
                 )
               ],
             ),
@@ -104,7 +116,7 @@ class ChatMessage extends StatelessWidget {
    State createState() => new ChatScreenState();
  }
 
- class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
+ class ChatScreenState extends State<ChatScreen> {
   //  @override
     Widget _buildTextComposer() {
      return new IconTheme(
@@ -116,6 +128,23 @@ class ChatMessage extends StatelessWidget {
          padding: new EdgeInsets.only(left:20.0),
           child: new Row(
             children: <Widget>[
+              new Container(
+                margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                child: new IconButton(
+                  icon: new Icon(Icons.photo_camera),
+                  color: Colors.pink[400],
+                  onPressed: () async {
+                    await _ensureLoggedIn();
+                    File imageFile = await ImagePicker.pickImage();
+                    int random = new Random().nextInt(100000);
+                    StorageReference ref =
+                    FirebaseStorage.instance.ref().child("image_$random.jpg");
+                    StorageUploadTask uploadTask = ref.put(imageFile);
+                    Uri downloadUrl = (await uploadTask.future).downloadUrl;
+                    _sendMessage(imageUrl: downloadUrl.toString());
+                  },
+                ),
+              ),
               new Flexible(
                 child: new Container(
                   child: new TextField(
@@ -159,13 +188,6 @@ class ChatMessage extends StatelessWidget {
       ),
     );
    }
-  
-  @override
-  void dispose(){
-    for (ChatMessage message in _messages) {
-      message.animationController.dispose();
-    }
-  }
 final firebasedbReference = FirebaseDatabase.instance.reference().child('messages');
 
   // clear the field on the text input field
@@ -175,24 +197,14 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text}) {
-      ChatMessage message = new ChatMessage(
-      text: text,
-      animationController: new AnimationController(
-        duration: new Duration(milliseconds: 750),
-        vsync: this,
-      ),
-    );
-
+    void _sendMessage({String text, String imageUrl}) {
     firebasedbReference.push().set({                                 
-    'text': text,                                        
+    'text': text,
+    'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
     'senderPhotoUrl': googleSignIn.currentUser.photoUrl, 
   });              
-    setState(() => _messages.insert(0, message)); 
-    message.animationController.forward();
     analytics.logEvent(name: 'send_message');
-    //analytics.logEvent(name: 'first_open');
   }
 
   Future<Null> _ensureLoggedIn() async {
