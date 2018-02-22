@@ -85,13 +85,13 @@ class ChatMessage extends StatelessWidget {
                     snapshot.value['imageUrl'],
                     width: 250.0,
                   ):
-                  new Text(snapshot.value['text'],
-                  style: new TextStyle(
-                    fontSize: 15.50,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Roboto',
-                    ),
-                  ),
+                  new Text(snapshot.value['text']),
+                  // style: new TextStyle(
+                  //   fontSize: 15.50,
+                  //   fontWeight: FontWeight.w500,
+                  //   fontFamily: 'Roboto',
+                  //   ),
+                  // ),
                   // child: new Text(
                   // snapshot.value['text'],
                   // style: new TextStyle(
