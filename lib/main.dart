@@ -3,19 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-<<<<<<< HEAD
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_database/firebase_database.dart';
-//import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
-=======
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:image_picker/image_picker.dart';
->>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
 import 'dart:async';
 import 'dart:math';
 import 'dart:io';
@@ -28,13 +20,6 @@ final TextEditingController _textController = new TextEditingController();
 final googleSignIn = new GoogleSignIn();
 final analytics = new FirebaseAnalytics();
 final auth = FirebaseAuth.instance;
-
- final String _currentUserName  = googleSignIn.currentUser.displayName;
- final String _currentUserImage = googleSignIn.currentUser.photoUrl;
- final googleSignIn = new GoogleSignIn();
- final analytics = new FirebaseAnalytics();
- final auth = FirebaseAuth.instance;
-
 
 //default color scheme for both IOS and ANDRIOD respectively
  final ThemeData kIOSTheme = new ThemeData(
@@ -50,11 +35,6 @@ final auth = FirebaseAuth.instance;
   );
 // End of color Scheme for IOS and ANDROID
 
-<<<<<<< HEAD
-//  declaring, name as a variable
-
-=======
->>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
 class BeKindApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -86,16 +66,9 @@ class ChatMessage extends StatelessWidget {
           new Container(
             margin: const EdgeInsets.only(right: 16.0),
             child: new CircleAvatar(
-<<<<<<< HEAD
-              // child: new Text(_cu_currentUserName[0])
-              backgroundImage: 
-                   new NetworkImage(_currentUserImage),
-            ),
-=======
               backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
               // child: new Text(_currentUserName[0])
               ),
->>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
           ),
           new Expanded(
             child: new Column(
@@ -104,14 +77,9 @@ class ChatMessage extends StatelessWidget {
               verticalDirection: VerticalDirection.down,
               children: <Widget>[
                 new Text(
-<<<<<<< HEAD
-                 _currentUserName,
-                  style: Theme.of(context).textTheme.subhead),
-=======
                   snapshot.value['senderName'],
                   style: Theme.of(context).textTheme.subhead
                   ),
->>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
                 new Container(
                   margin: const EdgeInsets.only(top: 5.0),
                   child: snapshot.value['imageUrl'] != null ?
@@ -235,49 +203,6 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       setState(() => _isComposing =false);
       await _ensureLoggedIn();
       _sendMessage(text: text);
-<<<<<<< HEAD
-  }
-  void _sendMessage({ String text}) {
-    ChatMessage message = new ChatMessage(
-      text: text,
-      animationController: new AnimationController(
-        duration: new Duration(milliseconds: 750),
-        vsync: this,
-      ),
-    );
-    setState(() => _messages.insert(0, message)); 
-    message.animationController.forward();
-    analytics.logEvent(name: 'send_message');
-  }
-
-Future<Null> _ensureLoggedIn() async {
-  GoogleSignInAccount user = googleSignIn.currentUser;
-  if (user == null)
-    user = await googleSignIn.signInSilently();
-  if (user == null) {
-    await googleSignIn.signIn();
-    analytics.logLogin();
-  }
-
-  if (await auth.currentUser() == null) {
-    GoogleSignInAuthentication credentials = 
-    await googleSignIn.currentUser.authentication;
-    await auth.signInWithGoogle(
-      idToken: credentials.idToken,
-      accessToken: credentials.accessToken
-    );
-  }
-  if (await auth.currentUser() == null) {
-    GoogleSignInAuthentication credentials = 
-    await googleSignIn.currentUser.authentication;
-    await auth.signInWithFacebook(
-      //idToken: credentials.idToken,
-      accessToken: credentials.accessToken
-    );
-  }
-}
-
-=======
  }
     void _sendMessage({String text, String imageUrl}) {
     firebasedbReference.push().set({                                 
@@ -307,7 +232,6 @@ Future<Null> _ensureLoggedIn() async {
   }
 }
   
->>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
    Widget build(BuildContext context) {
      return new Scaffold(
          appBar:  new AppBar(
