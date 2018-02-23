@@ -1,17 +1,33 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+<<<<<<< HEAD
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_database/firebase_database.dart';
 //import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+=======
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:image_picker/image_picker.dart';
+>>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
 import 'dart:async';
+import 'dart:math';
+import 'dart:io';
 
 void main(){
   runApp(new BeKindApp());
 }
+bool _isComposing = false;
+final TextEditingController _textController = new TextEditingController();
+final googleSignIn = new GoogleSignIn();
+final analytics = new FirebaseAnalytics();
+final auth = FirebaseAuth.instance;
 
  final String _currentUserName  = googleSignIn.currentUser.displayName;
  final String _currentUserImage = googleSignIn.currentUser.photoUrl;
@@ -30,15 +46,20 @@ void main(){
   final ThemeData kDefaultTheme = new ThemeData(
     primarySwatch: Colors.pink,
     accentColor: Colors.pinkAccent[600],
+    // primaryColorBrightness: Brightness.light
   );
 // End of color Scheme for IOS and ANDROID
 
+<<<<<<< HEAD
 //  declaring, name as a variable
 
+=======
+>>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
 class BeKindApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
      return new MaterialApp(
+       debugShowCheckedModeBanner: false,
        title: "BeKind",
        theme: defaultTargetPlatform ==TargetPlatform.iOS ? kIOSTheme : kDefaultTheme,
        home: new ChatScreen(),
@@ -48,14 +69,14 @@ class BeKindApp extends StatelessWidget {
 
 // implementation of chat message list
 class ChatMessage extends StatelessWidget {
-  ChatMessage({this.text, this.animationController});
-  final String text;
-  final AnimationController animationController;
+  ChatMessage({this.snapshot, this.animation});
+  final DataSnapshot snapshot;
+  final Animation animation;
   @override
   Widget build(BuildContext context) {
     return new SizeTransition(
       sizeFactor: new CurvedAnimation(
-        parent: animationController, curve: Curves.easeIn),
+        parent: animation, curve: Curves.easeIn),
       axisAlignment: 0.0,
     child: new Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0),
@@ -65,10 +86,16 @@ class ChatMessage extends StatelessWidget {
           new Container(
             margin: const EdgeInsets.only(right: 16.0),
             child: new CircleAvatar(
+<<<<<<< HEAD
               // child: new Text(_cu_currentUserName[0])
               backgroundImage: 
                    new NetworkImage(_currentUserImage),
             ),
+=======
+              backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
+              // child: new Text(_currentUserName[0])
+              ),
+>>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
           ),
           new Expanded(
             child: new Column(
@@ -77,17 +104,36 @@ class ChatMessage extends StatelessWidget {
               verticalDirection: VerticalDirection.down,
               children: <Widget>[
                 new Text(
+<<<<<<< HEAD
                  _currentUserName,
                   style: Theme.of(context).textTheme.subhead),
+=======
+                  snapshot.value['senderName'],
+                  style: Theme.of(context).textTheme.subhead
+                  ),
+>>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
                 new Container(
                   margin: const EdgeInsets.only(top: 5.0),
-                  child: new Text(text,
-                  style: new TextStyle(
-                    fontSize: 15.50,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Roboto',
-                    ),
-                  ),
+                  child: snapshot.value['imageUrl'] != null ?
+                  new Image.network(
+                    snapshot.value['imageUrl'],
+                    width: 250.0,
+                  ):
+                  new Text(snapshot.value['text']),
+                  // style: new TextStyle(
+                  //   fontSize: 15.50,
+                  //   fontWeight: FontWeight.w500,
+                  //   fontFamily: 'Roboto',
+                  //   ),
+                  // ),
+                  // child: new Text(
+                  // snapshot.value['text'],
+                  // style: new TextStyle(
+                  //   fontSize: 15.50,
+                  //   fontWeight: FontWeight.w500,
+                  //   fontFamily: 'Roboto',
+                  //   ),
+                  // ),
                 )
               ],
             ),
@@ -103,37 +149,55 @@ class ChatMessage extends StatelessWidget {
    @override
    State createState() => new ChatScreenState();
  }
-
- class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-
-   final TextEditingController _textController = new TextEditingController();
-   final List<ChatMessage> _messages = <ChatMessage>[];
-   bool _isComposing = false;
-   @override
-    Widget _buildTextComposer() {
+ class ChatScreenState extends State<ChatScreen> {
+  //@override
+   Widget _buildTextComposer() {
      return new IconTheme(
        data: new IconThemeData(color: Theme.of(context).accentColor),
         child: new Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        // width: 250.0,
+        width: 250.0,
         child: new Padding(
-         padding: new EdgeInsets.only(left:20.0),
+         padding: new EdgeInsets.only(left:5.0),
           child: new Row(
             children: <Widget>[
+              new Container(
+                margin: new EdgeInsets.symmetric(horizontal: 1.0),
+                child: new IconButton(
+                  icon: new Icon(Icons.photo_camera),
+                  color: Colors.white,
+                  padding: const EdgeInsets.only(right: 35.0),
+                  onPressed: () async {
+                    await _ensureLoggedIn();
+                    File imageFile = await ImagePicker.pickImage();
+                    int random = new Random().nextInt(100000);
+                    StorageReference ref =
+                    FirebaseStorage.instance.ref().child("image_$random.jpg");
+                    StorageUploadTask uploadTask = ref.put(imageFile);
+                    Uri downloadUrl = (await uploadTask.future).downloadUrl;
+                    _sendMessage(imageUrl: downloadUrl.toString());
+                  },
+                ),
+              ),
               new Flexible(
                 child: new Container(
-                  child: new TextField(
-                    style: new TextStyle(
-                      color: Colors.white, 
-                      decorationStyle: TextDecorationStyle.wavy,
-                      fontSize: 18.0
+                  child: new SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: new TextField(
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      style: new TextStyle(
+                        color: Colors.white, 
+                        decorationStyle: TextDecorationStyle.wavy,
+                        fontSize: 18.0
+                        ),
+                      controller: _textController,
+                      onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
+                      onSubmitted: _handleSubmitted,
+                      decoration: new InputDecoration.collapsed(
+                        hintText: "Type a mess...",
+                        hintStyle: new TextStyle(color: Colors.white70)
                       ),
-                    controller: _textController,
-                    onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
-                    onSubmitted: _handleSubmitted,
-                    decoration: new InputDecoration.collapsed(
-                      hintText: "Type a mess...",
-                      hintStyle: new TextStyle(color: Colors.white70)
                     ),
                   ),
                 ),
@@ -163,20 +227,15 @@ class ChatMessage extends StatelessWidget {
       ),
     );
    }
-  
-  @override
-  void dispose(){
-    for (ChatMessage message in _messages) {
-      message.animationController.dispose();
-    }
-  }
+final firebasedbReference = FirebaseDatabase.instance.reference().child('messages');
 
   // clear the field on the text input field
-  Future<Null> _handleSubmitted(String text) async {
+ Future<Null> _handleSubmitted(String text) async {
     _textController.clear();
       setState(() => _isComposing =false);
       await _ensureLoggedIn();
       _sendMessage(text: text);
+<<<<<<< HEAD
   }
   void _sendMessage({ String text}) {
     ChatMessage message = new ChatMessage(
@@ -218,6 +277,37 @@ Future<Null> _ensureLoggedIn() async {
   }
 }
 
+=======
+ }
+    void _sendMessage({String text, String imageUrl}) {
+    firebasedbReference.push().set({                                 
+    'text': text,
+    'imageUrl': imageUrl,                                        
+    'senderName': googleSignIn.currentUser.displayName,  
+    'senderPhotoUrl': googleSignIn.currentUser.photoUrl, 
+  });              
+    analytics.logEvent(name: 'send_message');
+  }
+
+  Future<Null> _ensureLoggedIn() async {
+  GoogleSignInAccount user = googleSignIn.currentUser;
+  if (user == null)
+    user = await googleSignIn.signInSilently();
+  if (user == null) {
+    await googleSignIn.signIn();
+    analytics.logLogin();
+  }
+  if (await auth.currentUser() == null) {
+    GoogleSignInAuthentication credentials =
+    await googleSignIn.currentUser.authentication;
+    await auth.signInWithGoogle(
+      idToken: credentials.idToken,
+      accessToken: credentials.accessToken
+    );
+  }
+}
+  
+>>>>>>> c088a3b782790bff8fd0a6d4f593faa60342149f
    Widget build(BuildContext context) {
      return new Scaffold(
          appBar:  new AppBar(
@@ -232,18 +322,37 @@ Future<Null> _ensureLoggedIn() async {
         child: new Column(
           children: <Widget>[
             new Flexible(
-              child: new ListView.builder(
+              child: new FirebaseAnimatedList(
+                query: firebasedbReference,
+                sort: (a,b) => b.key.compareTo(a.key),
                 padding: new EdgeInsets.all(8.0),
                 reverse: true,
-                itemBuilder: (_, int index) => _messages[index],
-                itemCount: _messages.length,
+                itemBuilder: (_, DataSnapshot snapshot, Animation<double> animation) { 
+                return new ChatMessage(
+                  snapshot: snapshot,
+                  animation:animation
+                 );
+                },
+                //itemCount: _messages.length,
               ),
             ),
-            new Divider(height: 1.0),
             new Container(
+            // width: 0.0,
+            child: new Divider(
+            height: 1.0,
+            color: Colors.grey[10]
+            ),
+            // decoration: new BoxDecoration(
+            //   color: Colors.grey[50],
+            //   borderRadius: new BorderRadius.all(const Radius.circular(35.0)),
+            // ),
+          ),
+            new Container(
+              margin: const EdgeInsets.only(right: 35.0),
               decoration: new BoxDecoration(
                 color: Theme.of(context).accentColor,
-                borderRadius: new BorderRadius.all(const Radius.circular(20.0))
+                borderRadius: new BorderRadius.all(const Radius.circular(20.0)),
+                
               ),
               child: _buildTextComposer(),
             )
