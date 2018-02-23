@@ -31,6 +31,7 @@ final auth = FirebaseAuth.instance;
   final ThemeData kDefaultTheme = new ThemeData(
     primarySwatch: Colors.pink,
     accentColor: Colors.pinkAccent[600],
+    // primaryColorBrightness: Brightness.light
   );
 // End of color Scheme for IOS and ANDROID
 
@@ -38,6 +39,7 @@ class BeKindApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
      return new MaterialApp(
+       debugShowCheckedModeBanner: false,
        title: "BeKind",
        theme: defaultTargetPlatform ==TargetPlatform.iOS ? kIOSTheme : kDefaultTheme,
        home: new ChatScreen(),
@@ -115,24 +117,24 @@ class ChatMessage extends StatelessWidget {
    @override
    State createState() => new ChatScreenState();
  }
-
  class ChatScreenState extends State<ChatScreen> {
-  //  @override
-    Widget _buildTextComposer() {
+  //@override
+   Widget _buildTextComposer() {
      return new IconTheme(
        data: new IconThemeData(color: Theme.of(context).accentColor),
         child: new Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        // width: 250.0,
+        width: 250.0,
         child: new Padding(
-         padding: new EdgeInsets.only(left:20.0),
+         padding: new EdgeInsets.only(left:5.0),
           child: new Row(
             children: <Widget>[
               new Container(
                 margin: new EdgeInsets.symmetric(horizontal: 1.0),
                 child: new IconButton(
                   icon: new Icon(Icons.photo_camera),
-                  color: Colors.pink[400],
+                  color: Colors.white,
+                  padding: const EdgeInsets.only(right: 35.0),
                   onPressed: () async {
                     await _ensureLoggedIn();
                     File imageFile = await ImagePicker.pickImage();
@@ -147,18 +149,23 @@ class ChatMessage extends StatelessWidget {
               ),
               new Flexible(
                 child: new Container(
-                  child: new TextField(
-                    style: new TextStyle(
-                      color: Colors.white, 
-                      decorationStyle: TextDecorationStyle.wavy,
-                      fontSize: 18.0
+                  child: new SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: new TextField(
+                      maxLines: null,
+                      keyboardType: TextInputType.multiline,
+                      style: new TextStyle(
+                        color: Colors.white, 
+                        decorationStyle: TextDecorationStyle.wavy,
+                        fontSize: 18.0
+                        ),
+                      controller: _textController,
+                      onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
+                      onSubmitted: _handleSubmitted,
+                      decoration: new InputDecoration.collapsed(
+                        hintText: "Type a mess...",
+                        hintStyle: new TextStyle(color: Colors.white70)
                       ),
-                    controller: _textController,
-                    onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
-                    onSubmitted: _handleSubmitted,
-                    decoration: new InputDecoration.collapsed(
-                      hintText: "Type a mess...",
-                      hintStyle: new TextStyle(color: Colors.white70)
                     ),
                   ),
                 ),
@@ -253,11 +260,23 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
                 //itemCount: _messages.length,
               ),
             ),
-            new Divider(height: 1.0),
             new Container(
+            // width: 0.0,
+            child: new Divider(
+            height: 1.0,
+            color: Colors.grey[10]
+            ),
+            // decoration: new BoxDecoration(
+            //   color: Colors.grey[50],
+            //   borderRadius: new BorderRadius.all(const Radius.circular(35.0)),
+            // ),
+          ),
+            new Container(
+              margin: const EdgeInsets.only(right: 35.0),
               decoration: new BoxDecoration(
                 color: Theme.of(context).accentColor,
-                borderRadius: new BorderRadius.all(const Radius.circular(20.0))
+                borderRadius: new BorderRadius.all(const Radius.circular(20.0)),
+                
               ),
               child: _buildTextComposer(),
             )
