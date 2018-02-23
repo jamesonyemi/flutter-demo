@@ -2,11 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_database/firebase_database.dart';
+//import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'dart:async';
 
 void main(){
   runApp(new BeKindApp());
 }
+
+ final String _currentUserName  = googleSignIn.currentUser.displayName;
+ final String _currentUserImage = googleSignIn.currentUser.photoUrl;
+ final googleSignIn = new GoogleSignIn();
+ final analytics = new FirebaseAnalytics();
+ final auth = FirebaseAuth.instance;
+
 
 //default color scheme for both IOS and ANDRIOD respectively
  final ThemeData kIOSTheme = new ThemeData(
@@ -22,8 +34,6 @@ void main(){
 // End of color Scheme for IOS and ANDROID
 
 //  declaring, name as a variable
-const String _name = "James";
-final googleSignIn = new GoogleSignIn();
 
 class BeKindApp extends StatelessWidget {
   @override
@@ -54,7 +64,11 @@ class ChatMessage extends StatelessWidget {
         children: <Widget>[
           new Container(
             margin: const EdgeInsets.only(right: 16.0),
-            child: new CircleAvatar(child: new Text(_name[0])),
+            child: new CircleAvatar(
+              // child: new Text(_cu_currentUserName[0])
+              backgroundImage: 
+                   new NetworkImage(_currentUserImage),
+            ),
           ),
           new Expanded(
             child: new Column(
@@ -62,7 +76,9 @@ class ChatMessage extends StatelessWidget {
               textDirection: TextDirection.ltr,
               verticalDirection: VerticalDirection.down,
               children: <Widget>[
-                new Text(_name,style: Theme.of(context).textTheme.subhead),
+                new Text(
+                 _currentUserName,
+                  style: Theme.of(context).textTheme.subhead),
                 new Container(
                   margin: const EdgeInsets.only(top: 5.0),
                   child: new Text(text,
@@ -161,7 +177,8 @@ class ChatMessage extends StatelessWidget {
       setState(() => _isComposing =false);
       await _ensureLoggedIn();
       _sendMessage(text: text);
-
+  }
+  void _sendMessage({ String text}) {
     ChatMessage message = new ChatMessage(
       text: text,
       animationController: new AnimationController(
@@ -171,7 +188,35 @@ class ChatMessage extends StatelessWidget {
     );
     setState(() => _messages.insert(0, message)); 
     message.animationController.forward();
+    analytics.logEvent(name: 'send_message');
   }
+
+Future<Null> _ensureLoggedIn() async {
+  GoogleSignInAccount user = googleSignIn.currentUser;
+  if (user == null)
+    user = await googleSignIn.signInSilently();
+  if (user == null) {
+    await googleSignIn.signIn();
+    analytics.logLogin();
+  }
+
+  if (await auth.currentUser() == null) {
+    GoogleSignInAuthentication credentials = 
+    await googleSignIn.currentUser.authentication;
+    await auth.signInWithGoogle(
+      idToken: credentials.idToken,
+      accessToken: credentials.accessToken
+    );
+  }
+  if (await auth.currentUser() == null) {
+    GoogleSignInAuthentication credentials = 
+    await googleSignIn.currentUser.authentication;
+    await auth.signInWithFacebook(
+      //idToken: credentials.idToken,
+      accessToken: credentials.accessToken
+    );
+  }
+}
 
    Widget build(BuildContext context) {
      return new Scaffold(
@@ -214,12 +259,4 @@ class ChatMessage extends StatelessWidget {
       ),
      );
    }
-Future<Null> _ensureLoggedIn() async {
-  GoogleSignInAccount user = googleSignIn.currentUser;
-  if (user == null)
-    user = await googleSignIn.signInSilently();
-  if (user == null) {
-    await googleSignIn.signIn();
-  }
-}
  }
