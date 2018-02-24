@@ -215,13 +215,13 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text, String imageUrl, String sentTime}) {
+    void _sendMessage({String text, String imageUrl}) {
     firebasedbReference.push().set({                                 
     'text': text,
     'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
     'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
-  });              
+  }); 
     analytics.logEvent(name: 'send_message');
   }
 
