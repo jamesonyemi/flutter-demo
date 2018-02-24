@@ -270,7 +270,7 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
             // width: 0.0,
             child: new Divider(
             height: 1.0,
-            color: Colors.grey[10]
+            color: Colors.pink
             ),
             // decoration: new BoxDecoration(
             //   color: Colors.grey[50],
