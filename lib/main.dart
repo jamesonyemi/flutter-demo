@@ -149,22 +149,28 @@ class ChatMessage extends StatelessWidget {
               ),
               new Flexible(
                 child: new Container(
-                  child: new SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: new TextField(
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      style: new TextStyle(
-                        color: Colors.white, 
-                        decorationStyle: TextDecorationStyle.wavy,
-                        fontSize: 18.0
+                  child: new Scrollbar(
+                    child: new ConstrainedBox(
+                      constraints: new BoxConstraints(maxHeight: 100.0, maxWidth: 500.0),
+                      child: new SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: new TextField(
+                          maxLines: null,
+                          autofocus: true,
+                          keyboardType: TextInputType.multiline,
+                          style: new TextStyle(
+                            color: Colors.white, 
+                            decorationStyle: TextDecorationStyle.wavy,
+                            fontSize: 18.0
+                            ),
+                          controller: _textController,
+                          onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
+                          onSubmitted: _handleSubmitted,
+                          decoration: new InputDecoration.collapsed(
+                            hintText: "Type a mess...",
+                            hintStyle: new TextStyle(color: Colors.white70)
+                          ),
                         ),
-                      controller: _textController,
-                      onChanged: (String text) => setState( ()=> _isComposing = text.length > 0),
-                      onSubmitted: _handleSubmitted,
-                      decoration: new InputDecoration.collapsed(
-                        hintText: "Type a mess...",
-                        hintStyle: new TextStyle(color: Colors.white70)
                       ),
                     ),
                   ),
