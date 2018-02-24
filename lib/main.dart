@@ -77,7 +77,7 @@ class ChatMessage extends StatelessWidget {
               verticalDirection: VerticalDirection.down,
               children: <Widget>[
                 new Text(
-                  snapshot.value['senderName'],
+                  snapshot.value['senderName'].toString(),
                   style: Theme.of(context).textTheme.subhead
                   ),
                 new Container(
@@ -85,6 +85,10 @@ class ChatMessage extends StatelessWidget {
                   child: snapshot.value['imageUrl'] != null ?
                   new Image.network(
                     snapshot.value['imageUrl'],
+                    alignment: Alignment.center,
+                    fit: BoxFit.fitWidth,
+                    gaplessPlayback: true,
+                    repeat: ImageRepeat.noRepeat,
                     width: 250.0,
                   ):
                   new Text(snapshot.value['text']),
@@ -154,6 +158,7 @@ class ChatMessage extends StatelessWidget {
                       constraints: new BoxConstraints(maxHeight: 100.0, maxWidth: 500.0),
                       child: new SingleChildScrollView(
                         scrollDirection: Axis.vertical,
+                        reverse: true,
                         child: new TextField(
                           maxLines: null,
                           autofocus: true,
@@ -210,12 +215,12 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text, String imageUrl}) {
+    void _sendMessage({String text, String imageUrl, String sentTime}) {
     firebasedbReference.push().set({                                 
     'text': text,
     'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
-    'senderPhotoUrl': googleSignIn.currentUser.photoUrl, 
+    'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
   });              
     analytics.logEvent(name: 'send_message');
   }
