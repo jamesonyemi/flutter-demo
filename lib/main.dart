@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'dart:async';
 import 'dart:math';
 import 'dart:io';
@@ -275,13 +276,14 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
             // width: 0.0,
             child: new Divider(
             height: 1.0,
-            color: Colors.pink
+            color: Colors.pink,
             ),
             // decoration: new BoxDecoration(
             //   color: Colors.grey[50],
             //   borderRadius: new BorderRadius.all(const Radius.circular(35.0)),
             // ),
           ),
+          //new Text(new DateFormat("HH:mm").format(new DateTime.now())), //some work to do here
             new Container(
               margin: const EdgeInsets.only(right: 35.0),
               decoration: new BoxDecoration(
