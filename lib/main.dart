@@ -55,70 +55,73 @@ class ChatMessage extends StatelessWidget {
   final Animation animation;
   @override
   Widget build(BuildContext context) {
-    return new Card(
-      elevation: 4.5,
-      color: const Color.fromRGBO(255, 255, 255, 1.0),
-         child: new SizeTransition(
-        sizeFactor: new CurvedAnimation(
-          parent: animation, curve: Curves.easeIn),
-        axisAlignment: 0.0,
-      child: new Container(
-        margin: const EdgeInsets.symmetric(vertical: 10.0),
-        child: new Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            new Container(
-                margin:new EdgeInsets.only(left: 3.5),
-                child: new Container(
-                margin: const EdgeInsets.only(right: 16.0),
-                child: new CircleAvatar(
-                  backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
-                  // child: new Text(_currentUserName[0])
-                  ),
-              ),
-            ),
-            new Expanded(
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // textDirection: TextDirection.ltr,
-                verticalDirection: VerticalDirection.down,
-                children: <Widget>[
-                  new Text(
-                    snapshot.value['senderName'].toString(),
-                    style: Theme.of(context).textTheme.subhead
+    return new Container(
+      decoration: new BoxDecoration(borderRadius: new BorderRadius.only(topLeft: Radius.zero)),
+         child: new Card(
+        elevation: 4.5,
+        color: const Color.fromRGBO(255, 255, 255, 1.0),
+           child: new SizeTransition(
+          sizeFactor: new CurvedAnimation(
+            parent: animation, curve: Curves.easeIn),
+          axisAlignment: 0.0,
+        child: new Container(
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          child: new Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              new Container(
+                  margin:new EdgeInsets.only(left: 3.5),
+                  child: new Container(
+                  margin: const EdgeInsets.only(right: 16.0),
+                  child: new CircleAvatar(
+                    backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
+                    // child: new Text(_currentUserName[0])
                     ),
-                  new Container(
-                    margin: const EdgeInsets.only(top: 5.0),
-                    child: snapshot.value['imageUrl'] != null ?
-                    new Image.network(
-                      snapshot.value['imageUrl'],
-                      alignment: Alignment.center,
-                      fit: BoxFit.fitWidth,
-                      gaplessPlayback: true,
-                      repeat: ImageRepeat.noRepeat,
-                      width: 250.0,
-                    ):
-                    new Text(snapshot.value['text'],style: new TextStyle(),),
-                    // style: new TextStyle(
-                    //   fontSize: 15.50,
-                    //   fontWeight: FontWeight.w500,
-                    //   fontFamily: 'Roboto',
-                    //   ),
-                    // ),
-                    // child: new Text(
-                    // snapshot.value['text'],
-                    // style: new TextStyle(
-                    //   fontSize: 15.50,
-                    //   fontWeight: FontWeight.w500,
-                    //   fontFamily: 'Roboto',
-                    //   ),
-                    // ),
-                  )
-                ],
+                ),
               ),
-            )
-          ],
-        ),
+              new Expanded(
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  // textDirection: TextDirection.ltr,
+                  verticalDirection: VerticalDirection.down,
+                  children: <Widget>[
+                    new Text(
+                      snapshot.value['senderName'].toString(),
+                      style: Theme.of(context).textTheme.subhead
+                      ),
+                    new Container(
+                      margin: const EdgeInsets.only(top: 5.0),
+                      child: snapshot.value['imageUrl'] != null ?
+                      new Image.network(
+                        snapshot.value['imageUrl'],
+                        alignment: Alignment.center,
+                        fit: BoxFit.fitWidth,
+                        gaplessPlayback: true,
+                        repeat: ImageRepeat.noRepeat,
+                        width: 250.0,
+                      ):
+                      new Text(snapshot.value['text'],style: new TextStyle(),),
+                      // style: new TextStyle(
+                      //   fontSize: 15.50,
+                      //   fontWeight: FontWeight.w500,
+                      //   fontFamily: 'Roboto',
+                      //   ),
+                      // ),
+                      // child: new Text(
+                      // snapshot.value['text'],
+                      // style: new TextStyle(
+                      //   fontSize: 15.50,
+                      //   fontWeight: FontWeight.w500,
+                      //   fontFamily: 'Roboto',
+                      //   ),
+                      // ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+         ),
        ),
      ),
    );
@@ -154,8 +157,11 @@ class ChatMessage extends StatelessWidget {
                     StorageReference ref =
                     FirebaseStorage.instance.ref().child("image_$random.jpg");
                     StorageUploadTask uploadTask = ref.put(imageFile);
-                    Uri downloadUrl = (await uploadTask.future).downloadUrl;
-                    _sendMessage(imageUrl: downloadUrl.toString());
+                    Uri downloadUrl = (
+                    await uploadTask.future).downloadUrl;
+                    _sendMessage(imageUrl: downloadUrl.toString(),
+                    //timeSent: new TimeOfDay.now().format(context).toString()
+                    );
                   },
                 ),
               ),
@@ -223,13 +229,15 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text, String imageUrl,String timeSent}) {
+    void _sendMessage({String text, String imageUrl,
+    //String timeSent
+    }) {
     firebasedbReference.push().set({                                 
     'text': text,
     'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
     'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
-    'timeSent': new TimeOfDay.now().format(context),
+    //'timeSent': new TimeOfDay.now().format(context),
   }); 
     analytics.logEvent(name: 'send_message');
   }
