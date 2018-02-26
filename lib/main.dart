@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'dart:async';
 import 'dart:math';
 import 'dart:io';
@@ -16,6 +17,7 @@ void main(){
   runApp(new BeKindApp());
 }
 bool _isComposing = false;
+TimeOfDay _timeSent = new TimeOfDay(hour: 24,minute: 60);
 final TextEditingController _textController = new TextEditingController();
 final googleSignIn = new GoogleSignIn();
 final analytics = new FirebaseAnalytics();
@@ -54,69 +56,77 @@ class ChatMessage extends StatelessWidget {
   final Animation animation;
   @override
   Widget build(BuildContext context) {
-    return new SizeTransition(
-      sizeFactor: new CurvedAnimation(
-        parent: animation, curve: Curves.easeIn),
-      axisAlignment: 0.0,
-    child: new Container(
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
-      child: new Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          new Container(
-            margin: const EdgeInsets.only(right: 16.0),
-            child: new CircleAvatar(
-              backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
-              // child: new Text(_currentUserName[0])
-              ),
-          ),
-          new Expanded(
-            child: new Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              textDirection: TextDirection.ltr,
-              verticalDirection: VerticalDirection.down,
-              children: <Widget>[
-                new Text(
-                  snapshot.value['senderName'].toString(),
-                  style: Theme.of(context).textTheme.subhead
+    return new Container(
+     child: new Card(
+       child: new SizeTransition(
+          sizeFactor: new CurvedAnimation(
+            parent: animation, curve: Curves.easeIn),
+          axisAlignment: 0.0,
+        child: new Container(
+          margin: const EdgeInsets.symmetric(vertical: 10.0),
+          child: new Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              new Container(
+                margin: const EdgeInsets.only(right: 16.0),
+                child: new Container(
+                  margin: new EdgeInsets.only(left: 2.0),
+                    child: new Container(
+                      color: Colors.white,
+                      child: new CircleAvatar(
+                      backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
+                      // child: new Text(_currentUserName[0])
+                      ),
+                    ),
                   ),
-                new Container(
-                  margin: const EdgeInsets.only(top: 5.0),
-                  child: snapshot.value['imageUrl'] != null ?
-                  new Image.network(
-                    snapshot.value['imageUrl'],
-                    alignment: Alignment.center,
-                    fit: BoxFit.fitWidth,
-                    gaplessPlayback: true,
-                    repeat: ImageRepeat.noRepeat,
-                    width: 250.0,
-                  ):
-                  new Text(snapshot.value['text']),
-                  // style: new TextStyle(
-                  //   fontSize: 15.50,
-                  //   fontWeight: FontWeight.w500,
-                  //   fontFamily: 'Roboto',
-                  //   ),
-                  // ),
-                  // child: new Text(
-                  // snapshot.value['text'],
-                  // style: new TextStyle(
-                  //   fontSize: 15.50,
-                  //   fontWeight: FontWeight.w500,
-                  //   fontFamily: 'Roboto',
-                  //   ),
-                  // ),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+              ),
+              new Expanded(
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  verticalDirection: VerticalDirection.down,
+                  children: <Widget>[
+                    new Text(
+                      snapshot.value['senderName'].toString(),
+                      style: Theme.of(context).textTheme.subhead
+                      ),
+                    new Container(
+                      margin: const EdgeInsets.only(top: 5.0),
+                      child: snapshot.value['imageUrl'] != null ?
+                      new Image.network(
+                        snapshot.value['imageUrl'],
+                        alignment: Alignment.center,
+                        fit: BoxFit.fitWidth,
+                        gaplessPlayback: true,
+                        repeat: ImageRepeat.noRepeat,
+                        width: 250.0,
+                      ):
+                      new Text(snapshot.value['text']),
+                      // style: new TextStyle(
+                      //   fontSize: 15.50,
+                      //   fontWeight: FontWeight.w500,
+                      //   fontFamily: 'Roboto',
+                      //   ),
+                      // ),
+                      // child: new Text(
+                      // snapshot.value['text'],
+                      // style: new TextStyle(
+                      //   fontSize: 15.50,
+                      //   fontWeight: FontWeight.w500,
+                      //   fontFamily: 'Roboto',
+                      //   ),
+                      // ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+         ),
+       ),
      ),
    );
   }
 }
-
  class  ChatScreen extends StatefulWidget {
    @override
    State createState() => new ChatScreenState();
@@ -143,6 +153,8 @@ class ChatMessage extends StatelessWidget {
                     await _ensureLoggedIn();
                     File imageFile = await ImagePicker.pickImage();
                     int random = new Random().nextInt(100000);
+                    
+                    //save data into firebase database
                     StorageReference ref =
                     FirebaseStorage.instance.ref().child("image_$random.jpg");
                     StorageUploadTask uploadTask = ref.put(imageFile);
@@ -215,7 +227,7 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text, String imageUrl, String sentTime}) {
+    void _sendMessage({String text, String imageUrl}) {
     firebasedbReference.push().set({                                 
     'text': text,
     'imageUrl': imageUrl,                                        
@@ -246,8 +258,9 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
    Widget build(BuildContext context) {
      return new Scaffold(
          appBar:  new AppBar(
+           centerTitle: true,
          title: new Center(
-         child: new Text( "BeKind"),
+         child: new Text( "BeKinds"),
          ),
          elevation: Theme.of(context).platform ==TargetPlatform.iOS ? 0.0 : 4.0,
        ), 
