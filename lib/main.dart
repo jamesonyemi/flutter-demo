@@ -233,7 +233,7 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
     'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
     'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
-  });              
+  }); 
     analytics.logEvent(name: 'send_message');
   }
 
@@ -288,13 +288,14 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
             // width: 0.0,
             child: new Divider(
             height: 1.0,
-            color: Colors.pink
+            color: Colors.pink,
             ),
             // decoration: new BoxDecoration(
             //   color: Colors.grey[50],
             //   borderRadius: new BorderRadius.all(const Radius.circular(35.0)),
             // ),
           ),
+          //new Text(new DateFormat("HH:mm").format(new DateTime.now())), //some work to do here
             new Container(
               margin: const EdgeInsets.only(right: 35.0),
               decoration: new BoxDecoration(
