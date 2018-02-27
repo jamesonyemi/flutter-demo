@@ -17,7 +17,7 @@ void main(){
   runApp(new BeKindApp());
 }
 bool _isComposing = false;
-final String _timeSent = new DateFormat("MM DD HH:ma").format(new DateTime.now());
+final String _timeSent = new DateFormat("EEEE d MMM y, HH:ma").format(new DateTime.now());
 final TextEditingController _textController = new TextEditingController();
 final googleSignIn = new GoogleSignIn();
 final analytics = new FirebaseAnalytics();
@@ -103,6 +103,8 @@ class ChatMessage extends StatelessWidget {
                       new Container(
                         margin: new EdgeInsets.only(top: 2.5),
                         child: new Text(snapshot.value['text'], overflow: TextOverflow.clip),
+                        //padding: new EdgeInsets.fromLTRB(10.0, 2.0, 5.0, 1.2)
+                        // decoration: new DecoratedBox()(top:snapshot.value['timeSent']) 
                       ),
                       // style: new TextStyle(
                       //   fontSize: 15.50,
