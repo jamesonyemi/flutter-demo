@@ -17,6 +17,7 @@ void main(){
   runApp(new BeKindApp());
 }
 bool _isComposing = false;
+final String _timeSent = new DateFormat("MM DD HH:ma").format(new DateTime.now());
 final TextEditingController _textController = new TextEditingController();
 final googleSignIn = new GoogleSignIn();
 final analytics = new FirebaseAnalytics();
@@ -67,7 +68,7 @@ class ChatMessage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               new Container(
-                margin: const EdgeInsets.only(right: 16.0),
+               margin: const EdgeInsets.only(right: 16.0),
                 child: new Container(
                   margin: new EdgeInsets.only(left: 2.0),
                     child: new Container(
@@ -99,7 +100,10 @@ class ChatMessage extends StatelessWidget {
                         repeat: ImageRepeat.noRepeat,
                         width: 250.0,
                       ):
-                      new Text(snapshot.value['text']),
+                      new Container(
+                        margin: new EdgeInsets.only(top: 2.5),
+                        child: new Text(snapshot.value['text'], overflow: TextOverflow.clip),
+                      ),
                       // style: new TextStyle(
                       //   fontSize: 15.50,
                       //   fontWeight: FontWeight.w500,
@@ -226,9 +230,10 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text, String imageUrl}) {
+    void _sendMessage({String text, String imageUrl, DateTime timeSent}) {
     firebasedbReference.push().set({                                 
     'text': text,
+    'timeSent':_timeSent,
     'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
     'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
@@ -259,7 +264,7 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
          appBar:  new AppBar(
            centerTitle: true,
          title: new Center(
-         child: new Text( "BeKinds"),
+         child: new Text( "BeKind"),
          ),
          elevation: Theme.of(context).platform ==TargetPlatform.iOS ? 0.0 : 4.0,
        ), 
@@ -295,10 +300,7 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
             // ),
           ),
           // new Text(new DateFormat("HH:mm").format(new DateTime.now())), //some work to do here
-           new Text(new DateFormat("HH:ma").format(new DateTime.now())),
-          //  new Text(new DateFormat.Hms().parse(inputS)),
-          //  new Text(new TimeOfDay.fromDateTime(time)),
-           
+           new Text(new DateFormat("EEEE d MMM y, HH:ma").format(new DateTime.now())), 
             new Container(
               margin: const EdgeInsets.only(right: 35.0),
               decoration: new BoxDecoration(
