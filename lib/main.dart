@@ -17,7 +17,6 @@ void main(){
   runApp(new BeKindApp());
 }
 bool _isComposing = false;
-TimeOfDay _timeSent = new TimeOfDay(hour: 24,minute: 60);
 final TextEditingController _textController = new TextEditingController();
 final googleSignIn = new GoogleSignIn();
 final analytics = new FirebaseAnalytics();
@@ -295,7 +294,11 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
             //   borderRadius: new BorderRadius.all(const Radius.circular(35.0)),
             // ),
           ),
-          //new Text(new DateFormat("HH:mm").format(new DateTime.now())), //some work to do here
+          // new Text(new DateFormat("HH:mm").format(new DateTime.now())), //some work to do here
+           new Text(new DateFormat("HH:ma").format(new DateTime.now())),
+          //  new Text(new DateFormat.Hms().parse(inputS)),
+          //  new Text(new TimeOfDay.fromDateTime(time)),
+           
             new Container(
               margin: const EdgeInsets.only(right: 35.0),
               decoration: new BoxDecoration(
