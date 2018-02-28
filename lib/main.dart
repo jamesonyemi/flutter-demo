@@ -48,7 +48,6 @@ class BeKindApp extends StatelessWidget {
      );
   }
 }
-
 // implementation of chat message list
 class ChatMessage extends StatelessWidget {
   ChatMessage({this.snapshot, this.animation});
@@ -85,6 +84,7 @@ class ChatMessage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   verticalDirection: VerticalDirection.down,
                   children: <Widget>[
+                    //new Text(snapshot.value['timeSent']),
                     new Text(
                       snapshot.value['senderName'].toString(),
                       style: Theme.of(context).textTheme.subhead
@@ -120,6 +120,10 @@ class ChatMessage extends StatelessWidget {
                       //   fontFamily: 'Roboto',
                       //   ),
                       // ),
+                    ),
+                  new Container(
+                        child: new Text(snapshot.value['timeSent']),
+                        padding: new EdgeInsets.only(top: 10.0),
                     )
                   ],
                 ),
@@ -275,6 +279,16 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       body: new Container(
         child: new Column(
           children: <Widget>[
+            new Container(
+                child: new Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+             children: [
+                 new Text(
+                   new DateFormat("EEEE d MMM y, HH:ma").format(new DateTime.now()),
+                   ),
+                   ], 
+                ),
+              ), 
             new Flexible(
               child: new FirebaseAnimatedList(
                 query: firebasedbReference,
