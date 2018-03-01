@@ -17,7 +17,9 @@ void main(){
   runApp(new BeKindApp());
 }
 bool _isComposing = false;
-final String _timeSent = new DateFormat("EEEE d MMM y, HH:ma").format(new DateTime.now());
+//final String _currentTime = new DateFormat("HH:ma").format(new DateTime.now());
+final String _createdDate = new DateFormat("EEEE d MMM, y").format(new DateTime.now());
+final String _createdTime = new DateFormat("HH:ma").format(new DateTime.now());
 final TextEditingController _textController = new TextEditingController();
 final googleSignIn = new GoogleSignIn();
 final analytics = new FirebaseAnalytics();
@@ -57,10 +59,11 @@ class ChatMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Container(
      child: new Card(
+       elevation: 4.5,
        child: new SizeTransition(
           sizeFactor: new CurvedAnimation(
             parent: animation, curve: Curves.easeIn),
-          axisAlignment: 0.0,
+            axisAlignment: 0.0,
         child: new Container(
           margin: const EdgeInsets.symmetric(vertical: 10.0),
           child: new Row(
@@ -72,6 +75,7 @@ class ChatMessage extends StatelessWidget {
                   margin: new EdgeInsets.only(left: 2.0),
                     child: new Container(
                       color: Colors.white,
+                      margin: new EdgeInsets.only(left:2.0),
                       child: new CircleAvatar(
                       backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
                       // child: new Text(_currentUserName[0])
@@ -84,7 +88,7 @@ class ChatMessage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   verticalDirection: VerticalDirection.down,
                   children: <Widget>[
-                    //new Text(snapshot.value['timeSent']),
+                    //new Text(snapshot.value['createdTime']),
                     new Text(
                       snapshot.value['senderName'].toString(),
                       style: Theme.of(context).textTheme.subhead
@@ -104,27 +108,32 @@ class ChatMessage extends StatelessWidget {
                         margin: new EdgeInsets.only(top: 2.5),
                         child: new Text(snapshot.value['text'], overflow: TextOverflow.clip),
                         //padding: new EdgeInsets.fromLTRB(10.0, 2.0, 5.0, 1.2)
-                        // decoration: new DecoratedBox()(top:snapshot.value['timeSent']) 
+                        // decoration: new DecoratedBox()(top:snapshot.value['createdTime']) 
                       ),
-                      // style: new TextStyle(
-                      //   fontSize: 15.50,
-                      //   fontWeight: FontWeight.w500,
-                      //   fontFamily: 'Roboto',
-                      //   ),
-                      // ),
-                      // child: new Text(
-                      // snapshot.value['text'],
-                      // style: new TextStyle(
-                      //   fontSize: 15.50,
-                      //   fontWeight: FontWeight.w500,
-                      //   fontFamily: 'Roboto',
-                      //   ),
-                      // ),
                     ),
+               snapshot.value['createdDate'] != null ? 
+                // new Card(child: new Text("Today"),color: Colors.red):
+                new Row(
+                  children:[
+                  new Row(
+                  children: [
                   new Container(
-                        child: new Text(snapshot.value['timeSent']),
-                        padding: new EdgeInsets.only(top: 10.0),
-                    )
+                      child: new Text(snapshot.value['createdDate'], 
+                      style: new TextStyle(color: Colors.grey)
+                      ),
+                          margin: new EdgeInsets.only(top:15.0, bottom: 0.0, right: 70.0),
+                          alignment: new Alignment(0.001, 5.0),
+                     ),
+                    ],
+                   ),
+                ],
+              ): null,
+              new Container(
+                  child: new Text(snapshot.value['createdTime'], 
+                  style: new TextStyle(color: Colors.grey,fontSize: 12.0)),
+                  padding: new EdgeInsets.only(top: 0.0),
+                  alignment: new Alignment(0.90, 5.0),
+                  )
                   ],
                 ),
               )
@@ -236,10 +245,11 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text, String imageUrl, DateTime timeSent}) {
+    void _sendMessage({String text, String imageUrl, DateTime createdTime, DateTime createdDate}) {
     firebasedbReference.push().set({                                 
     'text': text,
-    'timeSent':_timeSent,
+    'createdTime':_createdTime,
+    'createdDate':_createdDate,
     'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
     'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
@@ -279,16 +289,21 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       body: new Container(
         child: new Column(
           children: <Widget>[
-            new Container(
-                child: new Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-             children: [
-                 new Text(
-                   new DateFormat("EEEE d MMM y, HH:ma").format(new DateTime.now()),
-                   ),
-                   ], 
-                ),
-              ), 
+            // new Container(
+            //     child: new Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //  children: [
+            //    _createdDate == false ? new Card(child: new Text("Today"),color: Colors.red):
+            //      new Column(
+            //       children:[ new Card(
+            //            color: Colors.greenAccent[200],
+            //            child: new Text("Todays") ,
+            //          ),
+            //         ]
+            //        ),
+            //       ], 
+            //     ),
+            //   ), 
             new Flexible(
               child: new FirebaseAnimatedList(
                 query: firebasedbReference,
@@ -315,8 +330,8 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
             //   borderRadius: new BorderRadius.all(const Radius.circular(35.0)),
             // ),
           ),
-          // new Text(new DateFormat("HH:mm").format(new DateTime.now())), //some work to do here
-           new Text(new DateFormat("EEEE d MMM y, HH:ma").format(new DateTime.now())), 
+          // // new Text(new DateFormat("HH:mm").format(new DateTime.now())), //some work to do here
+          //  new Text(new DateFormat("EEEE d MMM y, HH:ma").format(new DateTime.now())), 
             new Container(
               margin: const EdgeInsets.only(right: 35.0),
               decoration: new BoxDecoration(
