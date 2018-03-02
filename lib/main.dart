@@ -35,7 +35,7 @@ final auth = FirebaseAuth.instance;
   final ThemeData kDefaultTheme = new ThemeData(
     primarySwatch: Colors.pink,
     accentColor: Colors.pinkAccent[600],
-    // primaryColorBrightness: Brightness.light
+    primaryColorBrightness: Brightness.dark
   );
 // End of color Scheme for IOS and ANDROID
 
@@ -104,12 +104,18 @@ class ChatMessage extends StatelessWidget {
                         repeat: ImageRepeat.noRepeat,
                         width: 250.0,
                       ):
-                      new Container(
-                        margin: new EdgeInsets.only(top: 2.5),
-                        child: new Text(snapshot.value['text'], overflow: TextOverflow.clip),
-                        //padding: new EdgeInsets.fromLTRB(10.0, 2.0, 5.0, 1.2)
-                        // decoration: new DecoratedBox()(top:snapshot.value['createdTime']) 
-                      ),
+                      // new Card(
+                        // elevation: 10.0-200.0/100.0*0.0,
+                        // color: new Color.fromRGBO(255, 255, 255,20.0),
+                          new Container(
+                          margin: new EdgeInsets.only(top: 2.5, right: 40.0),
+                          padding: new EdgeInsets.symmetric(horizontal: 15.5),
+                          child: new Text(snapshot.value['text'],),
+                          // color: Colors.red,
+                          //padding: new EdgeInsets.fromLTRB(10.0, 2.0, 5.0, 1.2)
+                          // decoration: new DecoratedBox()(top:snapshot.value['createdTime']) 
+                        ),
+                      // ),
                     ),
                snapshot.value['createdDate'] != null ? 
                 // new Card(child: new Text("Today"),color: Colors.red):
@@ -118,11 +124,10 @@ class ChatMessage extends StatelessWidget {
                   new Row(
                   children: [
                   new Container(
-                      child: new Text(snapshot.value['createdDate'], 
-                      style: new TextStyle(color: Colors.grey)
+                      child: new Text(snapshot.value['createdDate'],
+                      style: new TextStyle(color: Colors.grey),
                       ),
-                          margin: new EdgeInsets.only(top:15.0, bottom: 0.0, right: 70.0),
-                          alignment: new Alignment(0.001, 5.0),
+                      margin: new EdgeInsets.only(top:20.0, bottom: 0.0, right: 70.0),
                      ),
                     ],
                    ),
