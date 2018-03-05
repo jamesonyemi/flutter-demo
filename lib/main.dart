@@ -17,9 +17,6 @@ void main(){
   runApp(new BeKindApp());
 }
 bool _isComposing = false;
-//final String _currentTime = new DateFormat("HH:ma").format(new DateTime.now());
-final String _createdDate = new DateFormat("EEEE d MMM, y").format(new DateTime.now());
-final String _createdTime = new DateFormat("HH:ma").format(new DateTime.now());
 final TextEditingController _textController = new TextEditingController();
 final googleSignIn = new GoogleSignIn();
 final analytics = new FirebaseAnalytics();
@@ -250,11 +247,11 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text, String imageUrl, DateTime createdTime, DateTime createdDate}) {
+    void _sendMessage({String text, String imageUrl, String createdTime, String createdDate}) {
     firebasedbReference.push().set({                                 
     'text': text,
-    'createdTime':_createdTime,
-    'createdDate':_createdDate,
+    'createdTime':new TimeOfDay.now().format(context),
+    'createdDate':new DateFormat("EEEE dd MMMM, y").format(new DateTime.now()),
     'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
     'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
