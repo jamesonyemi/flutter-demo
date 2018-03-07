@@ -74,6 +74,7 @@ class ChatMessage extends StatelessWidget {
                       color: Colors.white,
                       margin: new EdgeInsets.only(left:2.0),
                       child: new CircleAvatar(
+                        radius: 25.0,
                       backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
                       // child: new Text(_currentUserName[0])
                       ),
@@ -87,27 +88,38 @@ class ChatMessage extends StatelessWidget {
                   children: <Widget>[
                     //new Text(snapshot.value['createdTime']),
                     new Text(
-                      snapshot.value['senderName'].toString(),
+                      snapshot.value['senderName'],
                       style: Theme.of(context).textTheme.subhead
                       ),
                     new Container(
-                      margin: const EdgeInsets.only(top: 5.0),
+                      margin: const EdgeInsets.only(top: 5.0,),
                       child: snapshot.value['imageUrl'] != null ?
-                      new Image.network(
-                        snapshot.value['imageUrl'],
-                        alignment: Alignment.center,
-                        fit: BoxFit.fitWidth,
-                        gaplessPlayback: true,
-                        repeat: ImageRepeat.noRepeat,
-                        width: 250.0,
+                      new Container(
+                        margin: new EdgeInsets.only(right: 50.5, top: 2.5),
+                            child: new Card(
+                            child: new Image.network(
+                            snapshot.value['imageUrl'],
+                            alignment: Alignment.center,
+                            fit: BoxFit.fitWidth,
+                            gaplessPlayback: true,
+                            repeat: ImageRepeat.noRepeat,
+                            width: 250.0,
+                          ),
+                        ),
                       ):
                       // new Card(
                         // elevation: 10.0-200.0/100.0*0.0,
                         // color: new Color.fromRGBO(255, 255, 255,20.0),
                           new Container(
                           margin: new EdgeInsets.only(top: 2.5, right: 40.0),
-                          padding: new EdgeInsets.symmetric(horizontal: 15.5),
-                          child: new Text(snapshot.value['text'],),
+                          padding: new EdgeInsets.symmetric(horizontal: 4.0),
+                          child: new Text(snapshot.value['text'].toString(),
+                          style: new TextStyle(
+                            color: Colors.black,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w400,
+                           )
+                          ),
                           // color: Colors.red,
                           //padding: new EdgeInsets.fromLTRB(10.0, 2.0, 5.0, 1.2)
                           // decoration: new DecoratedBox()(top:snapshot.value['createdTime']) 
@@ -116,23 +128,21 @@ class ChatMessage extends StatelessWidget {
                     ),
                snapshot.value['createdDate'] != null ? 
                 // new Card(child: new Text("Today"),color: Colors.red):
-                new Row(
-                  children:[
+               
                   new Row(
                   children: [
                   new Container(
-                      child: new Text(snapshot.value['createdDate'],
-                      style: new TextStyle(color: Colors.grey),
+                      child: new Text(snapshot.value['createdDate'].toString().toUpperCase(),
+                      style: new TextStyle(color: Colors.blueGrey,fontSize: 8.5,),
                       ),
                       margin: new EdgeInsets.only(top:20.0, bottom: 0.0, right: 70.0),
                      ),
                     ],
-                   ),
-                ],
-              ): null,
+                   ): null,
+              
               new Container(
                   child: new Text(snapshot.value['createdTime'], 
-                  style: new TextStyle(color: Colors.grey,fontSize: 12.0)),
+                  style: new TextStyle(color: Colors.blueGrey,fontSize: 8.5,)),
                   padding: new EdgeInsets.only(top: 0.0),
                   alignment: new Alignment(0.90, 5.0),
                   )
@@ -251,7 +261,7 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
     firebasedbReference.push().set({                                 
     'text': text,
     'createdTime':new TimeOfDay.now().format(context),
-    'createdDate':new DateFormat("EEEE dd MMMM, y").format(new DateTime.now()),
+    'createdDate':new DateFormat("EEEE dd MMM, y").format(new DateTime.now()),
     'imageUrl': imageUrl,                                        
     'senderName': googleSignIn.currentUser.displayName,  
     'senderPhotoUrl': googleSignIn.currentUser.photoUrl,
@@ -287,7 +297,6 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
          elevation: Theme.of(context).platform ==TargetPlatform.iOS ? 0.0 : 4.0,
        ), 
        
-      //  body: _buildTextComposer(),
       body: new Container(
         child: new Column(
           children: <Widget>[
