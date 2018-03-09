@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'dart:math';
@@ -76,7 +77,6 @@ class ChatMessage extends StatelessWidget {
                       child: new CircleAvatar(
                         radius: 25.0,
                       backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
-                      // child: new Text(_currentUserName[0])
                       ),
                     ),
                   ),
@@ -86,7 +86,6 @@ class ChatMessage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   verticalDirection: VerticalDirection.down,
                   children: <Widget>[
-                    //new Text(snapshot.value['createdTime']),
                     new Text(
                       snapshot.value['senderName'],
                       style: Theme.of(context).textTheme.subhead
@@ -162,12 +161,31 @@ class ChatMessage extends StatelessWidget {
    State createState() => new ChatScreenState();
  }
  class ChatScreenState extends State<ChatScreen> {
-  //@override
+  int _counter = 0;
+  ScrollController _scrollController;                                 // NEW
+  @override                                                           // NEW
+    void initState() {                                                // NEW
+        super.initState();                                            // NEW
+        _scrollController = new ScrollController(                     // NEW
+          initialScrollOffset: 0.0,                                   // NEW
+          keepScrollOffset: true,                                     // NEW
+        );
+      }
+    void _toEnd() { 
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(microseconds: 30),
+              curve: Curves.easeOut,
+            ).asStream();
+          });              
+    }                                                                   
+
    Widget _buildTextComposer() {
      return new IconTheme(
        data: new IconThemeData(color: Theme.of(context).accentColor),
-        child: new Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
+       child: new Container(
+       margin: const EdgeInsets.symmetric(horizontal: 8.0),
         width: 250.0,
         child: new Padding(
          padding: new EdgeInsets.only(left:5.0),
@@ -288,9 +306,19 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
 }
   
    Widget build(BuildContext context) {
+    List items = [];
+    for (int i = 0; i < _counter; i++) {
+      items.add(new Text("Item $i"));
+    }
      return new Scaffold(
-         appBar:  new AppBar(
-           centerTitle: true,
+        appBar:  new AppBar(
+        actions: <Widget>[                                            
+        new IconButton(                                             
+        icon: new Icon(Icons.arrow_upward), 
+          onPressed: _toEnd
+          )
+        ], 
+         centerTitle: true,
          title: new Center(
          child: new Text( "BeKind"),
          ),
@@ -300,24 +328,11 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       body: new Container(
         child: new Column(
           children: <Widget>[
-            // new Container(
-            //     child: new Column(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //  children: [
-            //    _createdDate == false ? new Card(child: new Text("Today"),color: Colors.red):
-            //      new Column(
-            //       children:[ new Card(
-            //            color: Colors.greenAccent[200],
-            //            child: new Text("Todays") ,
-            //          ),
-            //         ]
-            //        ),
-            //       ], 
-            //     ),
-            //   ), 
             new Flexible(
               child: new FirebaseAnimatedList(
+                shrinkWrap: false,
                 query: firebasedbReference,
+                controller: _scrollController,  
                 sort: (a,b) => b.key.compareTo(a.key),
                 padding: new EdgeInsets.all(8.0),
                 reverse: true,
@@ -327,22 +342,16 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
                   animation:animation
                  );
                 },
-                //itemCount: _messages.length,
               ),
             ),
+            
             new Container(
-            // width: 0.0,
             child: new Divider(
-            height: 1.0,
-            color: Colors.pink,
+            height: 2.0,
+            color: Colors.white,
             ),
-            // decoration: new BoxDecoration(
-            //   color: Colors.grey[50],
-            //   borderRadius: new BorderRadius.all(const Radius.circular(35.0)),
-            // ),
           ),
-          // // new Text(new DateFormat("HH:mm").format(new DateTime.now())), //some work to do here
-          //  new Text(new DateFormat("EEEE d MMM y, HH:ma").format(new DateTime.now())), 
+
             new Container(
               margin: const EdgeInsets.only(right: 35.0),
               decoration: new BoxDecoration(
