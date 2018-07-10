@@ -56,95 +56,66 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Container(
-     child: new Card(
-       elevation: 4.5,
-       child: new SizeTransition(
+      decoration: new BoxDecoration(borderRadius: new BorderRadius.only(topLeft: Radius.zero)),
+         child: new Card(
+        elevation: 4.5,
+        color: const Color.fromRGBO(255, 255, 255, 1.0),
+           child: new SizeTransition(
           sizeFactor: new CurvedAnimation(
             parent: animation, curve: Curves.easeIn),
-            axisAlignment: 0.0,
+          axisAlignment: 0.0,
         child: new Container(
           margin: const EdgeInsets.symmetric(vertical: 10.0),
           child: new Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               new Container(
-               margin: const EdgeInsets.only(right: 16.0),
-                child: new Container(
-                  margin: new EdgeInsets.only(left: 2.0),
-                    child: new Container(
-                      color: Colors.white,
-                      margin: new EdgeInsets.only(left:2.0),
-                      child: new CircleAvatar(
-                        radius: 25.0,
-                      backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
-                      ),
+                  margin:new EdgeInsets.only(left: 3.5),
+                  child: new Container(
+                  margin: const EdgeInsets.only(right: 16.0),
+                  child: new CircleAvatar(
+                    backgroundImage: new NetworkImage(snapshot.value['senderPhotoUrl']),
+                    // child: new Text(_currentUserName[0])
                     ),
-                  ),
+                ),
               ),
               new Expanded(
                 child: new Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  // textDirection: TextDirection.ltr,
                   verticalDirection: VerticalDirection.down,
                   children: <Widget>[
                     new Text(
-                      snapshot.value['senderName'],
+                      snapshot.value['senderName'].toString(),
                       style: Theme.of(context).textTheme.subhead
                       ),
                     new Container(
-                      margin: const EdgeInsets.only(top: 5.0,),
+                      margin: const EdgeInsets.only(top: 5.0),
                       child: snapshot.value['imageUrl'] != null ?
-                      new Container(
-                        margin: new EdgeInsets.only(right: 50.5, top: 2.5),
-                            child: new Card(
-                            child: new Image.network(
-                            snapshot.value['imageUrl'],
-                            alignment: Alignment.center,
-                            fit: BoxFit.fitWidth,
-                            gaplessPlayback: true,
-                            repeat: ImageRepeat.noRepeat,
-                            width: 250.0,
-                          ),
-                        ),
+                      new Image.network(
+                        snapshot.value['imageUrl'],
+                        alignment: Alignment.center,
+                        fit: BoxFit.fitWidth,
+                        gaplessPlayback: true,
+                        repeat: ImageRepeat.noRepeat,
+                        width: 250.0,
                       ):
-                      // new Card(
-                        // elevation: 10.0-200.0/100.0*0.0,
-                        // color: new Color.fromRGBO(255, 255, 255,20.0),
-                          new Container(
-                          margin: new EdgeInsets.only(top: 2.5, right: 40.0),
-                          padding: new EdgeInsets.symmetric(horizontal: 4.0),
-                          child: new Text(snapshot.value['text'].toString(),
-                          style: new TextStyle(
-                            color: Colors.black,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w400,
-                           )
-                          ),
-                          // color: Colors.red,
-                          //padding: new EdgeInsets.fromLTRB(10.0, 2.0, 5.0, 1.2)
-                          // decoration: new DecoratedBox()(top:snapshot.value['createdTime']) 
-                        ),
+                      new Text(snapshot.value['text'],style: new TextStyle(),),
+                      // style: new TextStyle(
+                      //   fontSize: 15.50,
+                      //   fontWeight: FontWeight.w500,
+                      //   fontFamily: 'Roboto',
+                      //   ),
                       // ),
-                    ),
-               snapshot.value['createdDate'] != null ? 
-                // new Card(child: new Text("Today"),color: Colors.red):
-               
-                  new Row(
-                  children: [
-                  new Container(
-                      child: new Text(snapshot.value['createdDate'].toString().toUpperCase(),
-                      style: new TextStyle(color: Colors.blueGrey,fontSize: 8.5,),
-                      ),
-                      margin: new EdgeInsets.only(top:20.0, bottom: 0.0, right: 70.0),
-                     ),
-                    ],
-                   ): null,
-              
-              new Container(
-                  child: new Text(snapshot.value['createdTime'], 
-                  style: new TextStyle(color: Colors.blueGrey,fontSize: 8.5,)),
-                  padding: new EdgeInsets.only(top: 0.0),
-                  alignment: new Alignment(0.90, 5.0),
-                  )
+                      // child: new Text(
+                      // snapshot.value['text'],
+                      // style: new TextStyle(
+                      //   fontSize: 15.50,
+                      //   fontWeight: FontWeight.w500,
+                      //   fontFamily: 'Roboto',
+                      //   ),
+                      // ),
+                    )
                   ],
                 ),
               )
@@ -278,7 +249,9 @@ final firebasedbReference = FirebaseDatabase.instance.reference().child('message
       await _ensureLoggedIn();
       _sendMessage(text: text);
  }
-    void _sendMessage({String text, String imageUrl, String createdTime, String createdDate}) {
+    void _sendMessage({String text, String imageUrl,
+    //String timeSent
+    }) {
     firebasedbReference.push().set({                                 
     'text': text,
     'createdTime':new TimeOfDay.now().format(context),
